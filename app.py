@@ -4,7 +4,7 @@ from psycopg2.errors import DivisionByZero
 from dotenv import load_dotenv
 import database
 
-DATABASE_PROMPT = "Enter the DATABASE_URI balue or leave empty to load from .env file: "
+DATABASE_PROMPT = "Enter the DATABASE_URI value or leave empty to load from .env file: "
 
 MENU_PROMPT = """ -- Menu --
 
@@ -18,6 +18,7 @@ MENU_PROMPT = """ -- Menu --
 Enter your choice: """
 
 NEW_OPTION_PROMPT = "Enter new option text (or leave empty to stop adding option): "
+
 
 def prompt_create_poll(connection):
     poll_title = input("Enter poll title: ")
@@ -73,3 +74,31 @@ def randomize_poll_winner(connection):
     option_id = int(input("Enter which is the winning option, we'll pick a random winner from voters: "))
     winner = database.get_random_poll_vote(connection, option_id)
     print(f"The randomly selected winner is {winner[0]}.")
+
+
+MENU_OPTIONS = {
+    "1": prompt_create_poll,
+    "2": list_open_polls,
+    "3": prompt_vote_poll,
+    "4": show_poll_votes,
+    "5": randomize_poll_winner
+}
+
+
+def menu():
+    database_uri = input(DATABASE_PROMPT)
+    if not database_uri:
+        load_dotenv()
+        database_uri = os.environ["DATABASE_URI"]
+
+    connection = psycopg2.connect(database_uri)
+    database.create_tables(connection)
+
+    while (selection := input(MENU_PROMPT)) != "6":
+        try:
+            MENU_OPTIONS[selection](connection)
+        except KeyError:
+            print("invalid input selected. Please try again.")
+
+
+menu()
