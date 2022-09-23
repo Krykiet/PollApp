@@ -60,7 +60,7 @@ def show_poll_votes(connection):
         # This gives us count and percentage of votes for each option in a poll
         poll_and_votes = database.get_poll_and_vote_results(connection, poll_id)
     except DivisionByZero:
-        print("No votes yet cast ofr this poll.")
+        print("No votes yet cast for this poll.")
     else:
         for _id, option_text, count, percentage in poll_and_votes:
             print(f"{option_text} got {count} votes ({percentage:.2f}% of total)")
